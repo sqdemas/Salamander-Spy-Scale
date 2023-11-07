@@ -44,7 +44,7 @@ def show_page_count_text() -> DesignerObject:
     return number
 
 def create_heart1() -> DesignerObject:
-    """ Create rightmost heart representing health in corner"""
+    """ Create rightmost heart in corner"""
     heart1 = image("heart_icon.png")
     heart1.y = 70
     heart1.x = get_width() - 30
@@ -52,7 +52,7 @@ def create_heart1() -> DesignerObject:
     return heart1
 
 def create_heart2() -> DesignerObject:
-    """ Create middle heart representing health in corner"""
+    """ Create middle heart in corner"""
     heart2 = image("heart_icon.png")
     heart2.y = 70
     heart2.x = get_width() - 70
@@ -60,7 +60,7 @@ def create_heart2() -> DesignerObject:
     return heart2
 
 def create_heart3() -> DesignerObject:
-    """ Create leftmost heart representing health in corner"""
+    """ Create leftmost heart in corner"""
     heart3 = image("heart_icon.png")
     heart3.y = 70
     heart3.x = get_width() - 110

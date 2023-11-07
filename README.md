@@ -16,7 +16,7 @@ Phase 1:
 - [x] Salamander moves: Salamander moves at constant speed left and right whenever arrow keys are pressed
 - [x] Holding keys: Salamander moves when keys are pressed and stops when keys are not pressed
 - [x] Screen limit: Salamander must stay visible on screen. When it hits a side, it stops moving that direction
-- [ ] Show stats: Page count and number of hearts are shown
+- [x] Show stats: Page count and number of hearts are shown
 
 Phase 2:
 - [ ] Pages exist: Pages appear randomly at top of screen 

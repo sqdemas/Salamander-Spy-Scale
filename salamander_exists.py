@@ -12,11 +12,14 @@ class World:
     page: DesignerObject
     page_count: int
     show_page_text: DesignerObject
+    heart1: DesignerObject
+    heart2: DesignerObject
+    heart3: DesignerObject
 
 def create_world() -> World:
     """ Create the world """
     return World(create_salamander(), 0, False, False, create_page_emoji(), 0,
-                 show_page_count_text())
+                 show_page_count_text(), create_heart1(), create_heart2(), create_heart3())
 
 def create_salamander() -> DesignerObject:
     """ Create salamander """
@@ -39,6 +42,30 @@ def show_page_count_text() -> DesignerObject:
     number.y = 30
     number.x = get_width() - 60
     return number
+
+def create_heart1() -> DesignerObject:
+    """ Create rightmost heart in corner"""
+    heart1 = image("heart_icon.png")
+    heart1.y = 70
+    heart1.x = get_width() - 30
+    grow(heart1, 0.04)
+    return heart1
+
+def create_heart2() -> DesignerObject:
+    """ Create middle heart in corner"""
+    heart2 = image("heart_icon.png")
+    heart2.y = 70
+    heart2.x = get_width() - 70
+    grow(heart2, 0.04)
+    return heart2
+
+def create_heart3() -> DesignerObject:
+    """ Create leftmost heart in corner"""
+    heart3 = image("heart_icon.png")
+    heart3.y = 70
+    heart3.x = get_width() - 110
+    grow(heart3, 0.04)
+    return heart3
 
 def screen_limit(world: World):
     """ Salamander stops moving when it touches screen edge """

@@ -3,15 +3,19 @@ CISC108 Honors Final Project- Designer Game
 
 Sam Demas, username: sqdemas
 
-**Pitch:** It is an infinite runner style game, with a Salamander scaling up a building. Players will maneuver the Salamander left and right with the arrow keys to collect pages of classified documents while dodging bombs in his path. When the Salamander is hit three times with a bomb, the game will end. There will be a settings tab in the corner allowing players to adjust difficulty between easy, normal, and hard.
+**Pitch:** It is an infinite runner style game, with a Salamander scaling up a building. 
+Players will maneuver the Salamander left and right with the arrow keys to collect pages of classified 
+documents while dodging bombs in his path. When the Salamander is hit three times with a bomb, the game
+will end. There will be a settings tab in the corner allowing players to adjust difficulty 
+between easy, normal, and hard.
 
 **Task List:**
 
 Phase 1:
-- [ ] Salamander exists: Salamander appears in center of screen
-- [ ] Salamander moves: Salamander moves at constant speed left and right whenever arrow keys are pressed
-- [ ] Holding keys: Salamander moves when keys are pressed and stops when keys are not pressed
-- [ ] Screen limit: Salamander must stay visible on screen. When it hits a side, it stops moving that direction
+- [x] Salamander exists: Salamander appears in center of screen
+- [x] Salamander moves: Salamander moves at constant speed left and right whenever arrow keys are pressed
+- [x] Holding keys: Salamander moves when keys are pressed and stops when keys are not pressed
+- [x] Screen limit: Salamander must stay visible on screen. When it hits a side, it stops moving that direction
 - [ ] Show stats: Page count and number of hearts are shown
 
 Phase 2:
@@ -31,3 +35,4 @@ Phase 3:
 - [ ] Salamander fall: When game ends, salamander falls to bottom of screen
 - [ ] Flash game over: Text shows game over and final page count
 - [ ] Moving background: Background moves downward to give illusion that salamander is moving upward
+

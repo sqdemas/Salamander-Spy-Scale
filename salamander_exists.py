@@ -67,10 +67,6 @@ def create_heart3() -> DesignerObject:
     grow(heart3, 0.04)
     return heart3
 
-def screen_limit(world: World):
-    """ Salamander stops moving when it touches screen edge """
-    if world.salamander.x > get_width() - 25 or world.salamander.x < 25:
-        world.salamander_speed = 0
 
 def move_salamander(world: World):
     """ Move salamander horizontally left and right """
@@ -99,17 +95,16 @@ def keys_not_pressed(world: World, key: str) :
         world.moving_left = False
 
 def salamander_direction(world: World):
-    """ Salamander moves horizontally depending on keys """
-    if world.moving_right:
+    """ Salamander moves horizontally depending on keys and only within screen limit """
+    if world.moving_right and world.salamander.x < get_width() - 31:
         move_right(world)
-    elif world.moving_left:
+    elif world.moving_left and world.salamander.x > 25:
         move_left(world)
     else:
         world.salamander_speed = 0
 
 when('starting', create_world)
 when('updating', move_salamander)
-when('updating', screen_limit)
 when('typing', keys_pressed)
 when('done typing', keys_not_pressed)
 when('updating', salamander_direction)

@@ -19,13 +19,13 @@ Phase 1:
 - [ ] Show stats: Page count and number of hearts are shown
 
 Phase 2:
-- [ ] Pages exist: Pages appear randomly at top of screen 
-- [ ] Pages move: Pages move straight downward at constant speed
-- [ ] Pages disappear: Pages disappear if at bottom or if touched by Salamander
-- [ ] Bombs exist: Bombs appear randomly at top of screen
-- [ ] Bombs move: Bombs move straight downward at constant speed
-- [ ] Bombs disappear: Bombs disappear if at bottom or if collides with salamander
-- [ ] Page count changes: Page count increases by one when Salamander touches page. Page count decreases by two if bomb is touched
+- [x] Pages exist: Pages appear randomly at top of screen 
+- [x] Pages move: Pages move straight downward at constant speed
+- [x] Pages disappear: Pages disappear if at bottom or if touched by Salamander
+- [x] Bombs exist: Bombs appear randomly at top of screen
+- [x] Bombs move: Bombs move straight downward at constant speed
+- [x] Bombs disappear: Bombs disappear if at bottom or if collides with salamander
+- [x] Page count changes: Page count increases by one when Salamander touches page. Page count decreases by two if bomb is touched
 - [ ] Hearts decrease: Hearts decrease by one when Salamander touches bomb 
 
 Phase 3:

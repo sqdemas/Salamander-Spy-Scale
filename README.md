@@ -1,7 +1,7 @@
 # Salamander-Spy-Scale
 CISC108 Honors Final Project- Designer Game
 
-Sam Demas, username: sqdemas
+Sam Demas, username: sqdemas, email: sqdemas@udel.edu
 
 **Pitch:** It is an infinite runner style game, with a Salamander scaling up a building. 
 Players will maneuver the Salamander left and right with the arrow keys to collect pages of classified 

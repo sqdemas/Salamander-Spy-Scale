@@ -28,7 +28,7 @@ Phase 2:
 - [x] Bombs move: Bombs move straight downward at constant speed
 - [x] Bombs disappear: Bombs disappear if at bottom or if collides with salamander
 - [x] Page count changes: Page count increases by one when Salamander touches page. Page count decreases by two if bomb is touched
-- [ ] Hearts decrease: Hearts decrease by one when Salamander touches bomb 
+- [x] Hearts decrease: Hearts decrease by one when Salamander touches bomb 
 
 Phase 3:
 - [ ] Opening window: Instructions and play button shown at beginning

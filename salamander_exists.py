@@ -4,7 +4,7 @@ from random import randint
 
 SALAMANDER_SPEED = 10
 PAGE_SPEED = 6
-BOMB_SPEED = 7
+BOMB_SPEED = 8
 
 @dataclass
 class World:
@@ -15,17 +15,16 @@ class World:
     page: DesignerObject
     page_count: int
     show_page_text: DesignerObject
-    heart1: DesignerObject
-    heart2: DesignerObject
-    heart3: DesignerObject
+    hearts: list[DesignerObject]
     pages: list[DesignerObject]
     bombs: list[DesignerObject]
+    hearts_remaining: int
 
 def create_world() -> World:
     """ Create the world """
     return World(create_salamander(), 0, False, False, create_page_emoji(), 0,
-                 show_page_count_text(), create_heart1(), create_heart2(), create_heart3(),
-                 [], [])
+                 show_page_count_text(), [create_heart(690), create_heart(730), create_heart(770)],
+                 [], [], 3)
 
 def create_salamander() -> DesignerObject:
     """ Create salamander """
@@ -49,30 +48,13 @@ def show_page_count_text() -> DesignerObject:
     number.x = get_width() - 60
     return number
 
-def create_heart1() -> DesignerObject:
-    """ Create rightmost heart in corner"""
-    heart1 = image("heart_icon.png")
-    heart1.y = 70
-    heart1.x = get_width() - 30
-    grow(heart1, 0.04)
-    return heart1
-
-def create_heart2() -> DesignerObject:
-    """ Create middle heart in corner"""
-    heart2 = image("heart_icon.png")
-    heart2.y = 70
-    heart2.x = get_width() - 70
-    grow(heart2, 0.04)
-    return heart2
-
-def create_heart3() -> DesignerObject:
-    """ Create leftmost heart in corner"""
-    heart3 = image("heart_icon.png")
-    heart3.y = 70
-    heart3.x = get_width() - 110
-    grow(heart3, 0.04)
-    return heart3
-
+def create_heart(x: int) -> DesignerObject:
+    """ Create heart DesignerObject"""
+    heart = image("heart_icon.png")
+    heart.y = 70
+    heart.x = x
+    grow(heart, 0.04)
+    return heart
 
 def move_salamander(world: World):
     """ Move salamander horizontally left and right """
@@ -187,13 +169,14 @@ def destroy_bomb_on_ground(world: World):
 
 def salamander_bombs_collide(world: World):
     """ When salamander and bombs collide:
-    Filters and destroys bombs,
-    then subtracts from score if possible (score must stay >= 0)
+    filter and destroy bombs,
+    subtracts from score (score must stay >= 0),
     removes a heart """
     keep_bombs = []
     for bomb in world.bombs:
         if colliding(bomb, world.salamander):
             destroy(bomb)
+            remove_heart(world)
             if world.page_count >= 2:
                 world.page_count -= 2
             else:
@@ -202,7 +185,19 @@ def salamander_bombs_collide(world: World):
             keep_bombs.append(bomb)
     world.bombs = keep_bombs
 
-# pages on bombs should not spawn on top of each other, nor pages together or bombs together
+def remove_heart(world: World):
+    """ updating hearts left """
+    world.hearts_remaining -= 1
+    for heart in world.hearts:
+        destroy(heart)
+    if (world.hearts_remaining == 3):
+        world.hearts = [create_heart(690), create_heart(730), create_heart(770)]
+    elif (world.hearts_remaining == 2):
+        world.hearts = [create_heart(730), create_heart(770)]
+    elif (world.hearts_remaining == 1):
+        world.hearts = [create_heart(770)]
+    elif (world.hearts_remaining == 0):
+        world.hearts = []
 
 when('starting', create_world)
 when('updating', move_salamander)

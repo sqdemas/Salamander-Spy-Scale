@@ -137,14 +137,14 @@ def destroy_page_on_ground(world: World):
 
 def destroy_when_page_collide(world: World):
     """ Filters and destroys pages that collide with Salamander, then adds to score"""
-    keep_pages = []
+    keep = []
     for page in world.pages:
         if colliding(page, world.salamander):
             destroy(page)
             world.page_count += 1
         else:
-            keep_pages.append(page)
-    world.pages = keep_pages
+            keep.append(page)
+    world.pages = keep
 
 def update_score_text(world: World):
     """ Score is shown and updated """
@@ -172,19 +172,19 @@ def move_bombs_down(world: World):
 
 def destroy_bomb_on_ground(world: World):
     """ Destroy bombs that touch the ground """
-    keeps = []
+    keep = []
     for bomb in world.bombs:
         if bomb.y < get_height():
-            keeps.append(bomb)
+            keep.append(bomb)
         else:
             destroy(bomb)
-        world.bombs = keeps
+        world.bombs = keep
 
 def salamander_bombs_collide(world: World):
     """ When salamander and bombs collide, filter and destroy bombs,
     subtracts from score
     removes a heart """
-    keep_bombs = []
+    keep = []
     for bomb in world.bombs:
         if colliding(bomb, world.salamander):
             destroy(bomb)
@@ -195,8 +195,8 @@ def salamander_bombs_collide(world: World):
             else:
                 world.page_count = 0
         else:
-            keep_bombs.append(bomb)
-    world.bombs = keep_bombs
+            keep.append(bomb)
+    world.bombs = keep
 
 def remove_heart(world: World):
     """ Subtracts from heart count, destroys heart, updating hearts in world """
@@ -217,6 +217,13 @@ def no_hearts(world: World) -> bool:
         bool: True if zero hearts, False if hearts exist """
     return not bool(world.hearts_remaining)
 
+def game_over_message(world: World):
+    """ Show game over message """
+    score_message = "GAME OVER! SCORE: " + str(world.page_count)
+    world.show_page_text = text("black", score_message, 30)
+    world.show_page_text.y = get_height() * 0.5
+    world.show_page_text.x = get_width() * 0.5
+
 when('starting', create_world)
 when('updating', move_salamander)
 when('typing', keys_pressed)
@@ -231,5 +238,5 @@ when('updating', make_bombs)
 when('updating', move_bombs_down)
 when('updating', destroy_bomb_on_ground)
 when('updating',salamander_bombs_collide)
-when(no_hearts,pause)
+when(no_hearts, game_over_message, pause)
 start()

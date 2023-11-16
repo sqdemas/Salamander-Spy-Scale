@@ -5,7 +5,15 @@ from random import randint
 SALAMANDER_SPEED = 10
 PAGE_SPEED = 6
 BOMB_SPEED = 8
+LEFT_HEART_X = 710
+MIDDLE_HEART_X = 745
+RIGHT_HEART_X = 780
+SPAWN_RATE = 50
+MAX_OBJECTS = 10
+MAX_X_POSITION = get_width() - 130
+MIN_X_POSITION = 128
 
+background_image('background.png')
 @dataclass
 class World:
     salamander: DesignerObject
@@ -23,14 +31,15 @@ class World:
 def create_world() -> World:
     """ Create the world """
     return World(create_salamander(), 0, False, False, create_page_emoji(), 0,
-                 show_page_count_text(), [create_heart(690), create_heart(730), create_heart(770)],
+                 show_page_count_text(),
+                 [create_heart(LEFT_HEART_X), create_heart(MIDDLE_HEART_X), create_heart(RIGHT_HEART_X)],
                  [], [], 3)
 
 def create_salamander() -> DesignerObject:
     """ Create salamander DesignerObject"""
     salamander = image("salamander_with_glasses.png")
-    salamander.y = get_height() * 0.5
-    grow(salamander, 0.2)
+    salamander.y = get_height() * 0.6
+    grow(salamander, 0.22)
     return salamander
 
 def create_page_emoji() -> DesignerObject:
@@ -53,7 +62,7 @@ def create_heart(x: int) -> DesignerObject:
     heart = image("heart_icon.png")
     heart.y = 70
     heart.x = x
-    grow(heart, 0.04)
+    grow(heart, 0.037)
     return heart
 
 def move_salamander(world: World):
@@ -88,9 +97,9 @@ def keys_not_pressed(world: World, key: str) :
 
 def salamander_direction(world: World):
     """ Salamander moves horizontally depending on keys and only within screen limit """
-    if world.moving_right and world.salamander.x < get_width() - 31:
+    if world.moving_right and world.salamander.x < MAX_X_POSITION:
         move_right(world)
-    elif world.moving_left and world.salamander.x > 25:
+    elif world.moving_left and world.salamander.x > MIN_X_POSITION:
         move_left(world)
     else:
         world.salamander_speed = 0
@@ -100,14 +109,14 @@ def create_page_object() -> DesignerObject:
     page = emoji("📃")
     grow(page, 0.8)
     page.anchor = "midtop"
-    page.x = randint(0, get_width())
+    page.x = randint(MIN_X_POSITION, MAX_X_POSITION)
     page.y = 0
     return page
 
 def make_pages(world: World):
     """ Create page randomly if there aren't enough currently """
-    not_enough_pages = len(world.pages) < 7
-    random_chance = randint(1,50) == 1
+    not_enough_pages = len(world.pages) < MAX_OBJECTS
+    random_chance = randint(1, SPAWN_RATE) == 1
     if not_enough_pages and random_chance:
         world.pages.append(create_page_object())
 
@@ -145,14 +154,14 @@ def create_bomb() -> DesignerObject:
     """ Create bomb DesignerObject """
     bomb = emoji("💣")
     bomb.anchor = "midtop"
-    bomb.x = randint(0, get_width())
+    bomb.x = randint(MIN_X_POSITION, MAX_X_POSITION)
     bomb.y = 0
     return bomb
 
 def make_bombs(world: World):
     """ Create bomb randomly if there aren't enough currently """
-    not_enough_bombs = len(world.bombs) < 5
-    random_odds = randint(1,50) == 1
+    not_enough_bombs = len(world.bombs) < MAX_OBJECTS
+    random_odds = randint(1, SPAWN_RATE) == 1
     if not_enough_bombs and random_odds:
         world.bombs.append(create_bomb())
 
@@ -173,13 +182,14 @@ def destroy_bomb_on_ground(world: World):
 
 def salamander_bombs_collide(world: World):
     """ When salamander and bombs collide, filter and destroy bombs,
-    subtracts from score (score must stay >= 0),
+    subtracts from score
     removes a heart """
     keep_bombs = []
     for bomb in world.bombs:
         if colliding(bomb, world.salamander):
             destroy(bomb)
             remove_heart(world)
+            # score must stay >= 0
             if world.page_count >= 2:
                 world.page_count -= 2
             else:
@@ -189,16 +199,16 @@ def salamander_bombs_collide(world: World):
     world.bombs = keep_bombs
 
 def remove_heart(world: World):
-    """ Subtracts from heart count, destroys heart, updating hearts left """
+    """ Subtracts from heart count, destroys heart, updating hearts in world """
     world.hearts_remaining -= 1
     for heart in world.hearts:
         destroy(heart)
     if (world.hearts_remaining == 3):
-        world.hearts = [create_heart(690), create_heart(730), create_heart(770)]
+        world.hearts = [create_heart(LEFT_HEART_X), create_heart(MIDDLE_HEART_X), create_heart(RIGHT_HEART_X)]
     elif (world.hearts_remaining == 2):
-        world.hearts = [create_heart(730), create_heart(770)]
+        world.hearts = [create_heart(MIDDLE_HEART_X), create_heart(RIGHT_HEART_X)]
     elif (world.hearts_remaining == 1):
-        world.hearts = [create_heart(770)]
+        world.hearts = [create_heart(RIGHT_HEART_X)]
     elif (world.hearts_remaining == 0):
         world.hearts = []
 def no_hearts(world: World) -> bool:

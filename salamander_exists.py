@@ -201,6 +201,11 @@ def remove_heart(world: World):
         world.hearts = [create_heart(770)]
     elif (world.hearts_remaining == 0):
         world.hearts = []
+def no_hearts(world: World) -> bool:
+    """ Evaluates if there are zero hearts
+    Return:
+        bool: True if zero hearts, False if hearts exist """
+    return not bool(world.hearts_remaining)
 
 when('starting', create_world)
 when('updating', move_salamander)
@@ -216,4 +221,5 @@ when('updating', make_bombs)
 when('updating', move_bombs_down)
 when('updating', destroy_bomb_on_ground)
 when('updating',salamander_bombs_collide)
+when(no_hearts,pause)
 start()

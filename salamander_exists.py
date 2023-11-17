@@ -224,6 +224,12 @@ def game_over_message(world: World):
     world.show_page_text.y = get_height() * 0.5
     world.show_page_text.x = get_width() * 0.5
 
+def salamander_fall_animation(world: World):
+    world.salamander['flip_y'] = True
+    #world.salamander.y += world.salamander_speed
+
+
+
 when('starting', create_world)
 when('updating', move_salamander)
 when('typing', keys_pressed)
@@ -238,5 +244,5 @@ when('updating', make_bombs)
 when('updating', move_bombs_down)
 when('updating', destroy_bomb_on_ground)
 when('updating',salamander_bombs_collide)
-when(no_hearts, game_over_message, pause)
+when(no_hearts, pause, salamander_fall_animation, game_over_message)
 start()

@@ -10,6 +10,7 @@ will end. There will be a settings tab in the corner allowing players to adjust 
 between easy, normal and hard.
 
 Milestone 1 Demo Video: https://youtu.be/vHzACxT1kBo
+Milestone 2 Demo Video: https://youtu.be/RAPvmDgH6WY
 
 **Task List:**
 

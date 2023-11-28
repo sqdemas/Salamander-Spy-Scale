@@ -10,15 +10,8 @@ MIDDLE_HEART_X = 745
 RIGHT_HEART_X = 780
 SPAWN_RATE = 30
 MAX_OBJECTS = 10
-MAX_X_POSITION = get_width() - 130
+MAX_X_POSITION = 670
 MIN_X_POSITION = 128
-
-@dataclass
-class PlayerSettings:
-    """ Pass information between scenes """
-    page_count: int
-    salamander_x_position: int
-    salamander_y_position: int
 
 @dataclass
 class World:
@@ -53,15 +46,12 @@ class TitleScreen:
     instruction_line5: DesignerObject
     play_button: Button
 
-
 @dataclass
-class PauseScreen:
+class EndScreen:
     """ Works as game over screen """
     background: DesignerObject
     message: DesignerObject
     quit_button: Button
-    salamander: DesignerObject
-
 
 def make_button(message: str, x: int, y: int, length: int, width: int, text_size: int, color: str) -> Button:
     """ Creates object with inner rectangle, outer rectangle, and text """
@@ -246,7 +236,11 @@ def destroy_bomb_on_ground(world: World):
             destroy(bomb)
         world.bombs = keep
 
-def salamander_bombs_collide(world: World, settings: PlayerSettings):
+def salamander_show_damage(world: World):
+    """ Sequence animation to show Salamander hurt when collides with bomb """
+    #sequence_animation(world.salamander, )
+
+def salamander_bombs_collide(world: World):
     """ When salamander and bombs collide,
     filter and destroy bombs,
     subtracts from score
@@ -255,7 +249,8 @@ def salamander_bombs_collide(world: World, settings: PlayerSettings):
     for bomb in world.bombs:
         if colliding(bomb, world.salamander):
             destroy(bomb)
-            remove_heart(world, settings)
+            #salamander_show_damage()
+            remove_heart(world)
             # score must stay >= 0
             if world.page_count >= 2:
                 world.page_count -= 2
@@ -265,16 +260,14 @@ def salamander_bombs_collide(world: World, settings: PlayerSettings):
             keep.append(bomb)
     world.bombs = keep
 
-def game_over(settings: PlayerSettings):
+def game_over(world: World):
     """ When there are no lives, the game is over.
-     Info from world is updated to settings to be used in PauseScreen
-     Then scene is changed
-    settings.page_count = 10
-    settings.salamander_x_position = int(world.salamander.x)
-    settings.salamander_y_position = int(world.salamander.y"""
-    change_scene('pause')
+     Salamander should fall off screen
+     Then scene is changed """
+    # linear_animation(world.salamander, 'y', world.salamander.y, 600, 3.0)
+    change_scene('end', final_page_count = world.page_count)
 
-def remove_heart(world: World, settings:PlayerSettings):
+def remove_heart(world: World):
     """ Subtracts from heart count, destroys heart, updating hearts in world """
     world.hearts_remaining -= 1
     for heart in world.hearts:
@@ -287,20 +280,17 @@ def remove_heart(world: World, settings:PlayerSettings):
         world.hearts = [create_heart(RIGHT_HEART_X)]
     elif (world.hearts_remaining == 0):
         world.hearts = []
-        game_over(settings)
+        game_over(world)
 
-def create_pause_screen(world: World) -> PauseScreen:
-    """ Has background, shows game over message, quit button,
-    salamander fall animation. Next goal: use settings to get actual salamander position and actual final score into pause screen
-    """
-    game_over_message = "GAME OVER! SCORE:  " + str(10)
-    return PauseScreen(background_image('background.png'),
-                       make_button(game_over_message, get_width()/2, 150, 450, 90, 40, 'oldlace'),
-                       make_button("QUIT", get_width()/2, 250, 80, 50, 30, 'skyblue'),
-                       create_salamander(400,360)
-                       )
+def create_end_screen(final_page_count: int) -> EndScreen:
+    """ Shows background, game over message with final score, and quit button to end program """
+    game_over_message = "GAME OVER! SCORE:  " + str(final_page_count)
+    return EndScreen(background_image('background.png'),
+                     make_button(game_over_message, get_width()/2, 270, 450, 90, 40, 'oldlace'),
+                     make_button("QUIT", get_width()/2, 350, 80, 50, 30, 'skyblue')
+                     )
 
-def handle_pause_buttons(world: PauseScreen):
+def handle_end_buttons(world: EndScreen):
     """ When user clicks quit button, application closes """
     if colliding_with_mouse(world.quit_button):
         quit()
@@ -323,8 +313,8 @@ when('updating: world', move_bombs_down)
 when('updating: world', destroy_bomb_on_ground)
 when('updating: world',salamander_bombs_collide)
 
-when('starting: pause', create_pause_screen)
-when('clicking: pause', handle_pause_buttons)
+when('starting: end', create_end_screen)
+when('clicking: end', handle_end_buttons)
 
 start()
 debug(scene = 'title')

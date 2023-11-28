@@ -28,6 +28,31 @@ class World:
     bombs: list[DesignerObject]
     hearts_remaining: int
 
+"""
+@dataclass
+class Button:
+    background: DesignerObject
+    border: DesignerObject
+    label: DesignerObject
+
+def make_button(message: str, x: int, y: int) -> Button:
+    horizontal_padding = 4
+    vertical_padding = 2
+    label = text('black', message, 20, x, y, layer= 'top')
+    return Button(rectangle('cyan', label.width + horizontal_padding, label.height + vertical_padding, x, y),
+                  rectangle('black', label.width + horizontal_padding, label.height + vertical_padding, x, y, 1),
+                  label)
+
+@dataclass
+class TitleScreen:
+    header: DesignerObject
+    play_button: Button
+
+def create_title_screen() -> TitleScreen:
+    ' Title Screen has text and a play button'
+    return TitleScreen(text('black', "text", 40),
+                       make_button("PLAY", get_width()/2, 400))
+"""
 def create_world() -> World:
     """ Create the world """
     return World(create_salamander(), 0, False, False, create_page_emoji(), 0,
@@ -226,7 +251,12 @@ def game_over_message(world: World):
 
 def salamander_fall_animation(world: World):
     world.salamander['flip_y'] = True
-    #world.salamander.y += world.salamander_speed
+    #get salamander to fal
+
+#salamander visibility flashes for a few seconds when colliding with bomb
+#what is a scene and how to change between title screen and this
+#can you unpause or have one thing move while the rest does not
+#moving background, moves down and wraps somehow?
 
 
 
@@ -244,5 +274,8 @@ when('updating', make_bombs)
 when('updating', move_bombs_down)
 when('updating', destroy_bomb_on_ground)
 when('updating',salamander_bombs_collide)
-when(no_hearts, pause, salamander_fall_animation, game_over_message)
+when(no_hearts, update_score_text, pause, salamander_fall_animation, game_over_message)
+#when('starting: title', create_title_screen)
+
+#debug(scene = 'title')
 start()

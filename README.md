@@ -33,7 +33,7 @@ Phase 2:
 - [x] Hearts decrease: Hearts decrease by one when Salamander touches bomb 
 
 Phase 3:
-- [ ] Opening window: Instructions and play button shown at beginning
+- [x] Opening window: Instructions and play button shown at beginning
 - [ ] Settings: Settings button causes window to appear which adjusts difficulty level
 - [ ] Salamander hurt: Salamander stops moving for a second and flashes red when a life is lost
 - [ ] Salamander fall: When game ends, salamander falls to bottom of screen

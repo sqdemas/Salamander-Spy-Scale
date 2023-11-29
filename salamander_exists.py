@@ -10,7 +10,7 @@ LEFT_HEART_X = 710
 MIDDLE_HEART_X = 745
 RIGHT_HEART_X = 780
 
-# screen limit x positons
+# screen limit x max and min positions
 MAX_X_POSITION = 670
 MIN_X_POSITION = 128
 
@@ -22,6 +22,7 @@ class Button:
 
 @dataclass
 class TitleScreen:
+    """ Welcome and instruction screen """
     background: DesignerObject
     header: DesignerObject
     instruction_background: DesignerObject
@@ -34,14 +35,15 @@ class TitleScreen:
 
 @dataclass
 class World:
+    """ Main gameplay """
     background: DesignerObject
     salamander: DesignerObject
     salamander_speed: int
     moving_left: bool
     moving_right: bool
-    page: DesignerObject
+    page_in_corner: DesignerObject
     page_count: int
-    show_page_text: DesignerObject
+    page_count_in_corner: DesignerObject
     hearts: list[DesignerObject]
     pages: list[DesignerObject]
     bombs: list[DesignerObject]
@@ -56,7 +58,7 @@ class World:
 
 @dataclass
 class SettingsScreen:
-    """ Displays settings to switch game difficulty """
+    """ Displays settings to adjust game difficulty """
     background: DesignerObject
     rectangle: DesignerObject
     heading: DesignerObject
@@ -73,14 +75,30 @@ class EndScreen:
     play_again_button: Button
 
 def make_button(message: str, x: int, y: int, length: int, width: int, text_size: int, color: str) -> Button:
-    """ Creates object with inner rectangle, outer rectangle, and text """
+    """
+    Creates a Button with inner rectangle, outer rectangle, and text
+    Args:
+        message (str): Message on button
+        x (int): x position of button
+        y (int): y position of button
+        length (int): how long rectangular button is
+        width (int): how tall rectangular button is
+        text_size (int): size of button text
+        color (str): color of button background
+    Returns:
+        Button: collection of DesignerObjects to make a button
+    """
     label = text('black', message, text_size, x, y, layer= 'top')
     return Button(rectangle(color, length, width, x, y),
                   rectangle('black', length, width, x, y, 1),
                   label)
 
 def create_title_screen() -> TitleScreen:
-    """ Title Screen has background, text in a box, and a play button """
+    """
+    Creates Title Screen with background, header, empty button with text instructions, and play button
+    Returns:
+        TitleScreen: TitleScreen instance
+    """
     instruction1 = "You are SuperSpy Salamander, the only spy with the ability to scale walls!"
     instruction2 = "Your mission is to collect pages of top secret documents"
     instruction3 = "by maneuvering SuperSpy Salamander with the left and right arrow keys."
@@ -96,11 +114,24 @@ def create_title_screen() -> TitleScreen:
                        text('black', instruction5, 20, 400, 300),
                        make_button("PLAY", get_width()/2, 400, 80, 50, 30, 'chartreuse'))
 
+def animate_background():
+    """
+    Sequence animation to loop through list of background images to give illusion of moving background
+    """
+    sequence_animation(background_image('one.png'), 'filename', [background_image('one.png'), background_image('two.png'), background_image('three.png')],
+                       3, 3, True, None, False)
+
 def create_world() -> World:
-    """ Create the world where actual gameplay occurs """
+    """
+    Creates the world where actual gameplay occurs, background, salamander character,
+    page count, hearts, settings button, and mode
+    Returns:
+        World: World instance
+    """
     return World(background_image('background.png'),
-                 create_salamander(400, 360), 0, False, False, create_page_emoji(), 0,
-                 show_page_count_text(),
+                 create_salamander(), 0, False, False,
+                 show_page_in_corner(), 0,
+                 show_page_count_in_corner(),
                  [create_heart(LEFT_HEART_X), create_heart(MIDDLE_HEART_X), create_heart(RIGHT_HEART_X)],
                  [], [], 3,
                  make_button("SETTINGS", 50, 40, 80, 40, 18, 'tan'),
@@ -110,7 +141,12 @@ def create_world() -> World:
                  )
 
 def create_settings_screen() -> SettingsScreen:
-    """ Settings to allow user to change difficulty """
+    """
+    Creates Settings to allow user to change difficulty with background, empty button for background,
+    header, and three difficulty buttons
+    Returns:
+        SettingsScreen: SettingScreen instance
+    """
     return SettingsScreen(background_image('city_background.jpg'),
                           make_button("", 400, 300, 640, 400, 0, 'cadetblue'),
                           text('black', "SETTINGS", 50, 400, 200),
@@ -120,26 +156,45 @@ def create_settings_screen() -> SettingsScreen:
                           )
 
 def create_end_screen(final_page_count: int) -> EndScreen:
-    """ Shows background, game over message with final score, quit button to end program, and play again button to redirect to world """
+    """
+    Game over screen with background, message and final score, quit button, and play again button
+    Args:
+         final_page_count (int): number of pages user collected, passed in from World
+    Returns:
+        EndScreen: EndScreen instance
+    """
     game_over_message = "GAME OVER! SCORE:  " + str(final_page_count)
     return EndScreen(background_image('background.png'),
-                     make_button(game_over_message, get_width()/2, 270, 450, 90, 40, 'oldlace'),
+                     make_button(game_over_message, 400, 270, 450, 90, 40, 'oldlace'),
                      make_button("QUIT", 300, 350, 80, 50, 30, 'skyblue'),
                      make_button("PLAY AGAIN", 450, 350, 160, 50, 30, 'skyblue')
                      )
 
 def handle_title_buttons(world: TitleScreen):
-    """ When user presses play button, scene changes to world """
+    """
+    When user presses play button, scene changes to world
+    Args:
+        world (TitleScreen): TitleScreen instance
+    """
     if colliding_with_mouse(world.play_button.background):
         change_scene('world')
 
 def handle_world_buttons(world: World):
-    """ Push settings scene when settings button is clicked """
+    """
+    When user presses settings button, settings scene is pushed
+    Args:
+        world (World): World instance
+    """
     if colliding_with_mouse(world.settings_button.background):
         push_scene('settings')
 
 def handle_settings_buttons(world: SettingsScreen):
-    """When user presses a difficulty mode, that mode is selected and sent back to world when scene is popped """
+    """
+    When user presses a difficulty button, settings scene is popped and a string
+    representing the difficulty is passed as a keyword argument back to World
+    Args:
+        world (TitleScreen): SettingsScreen instance
+    """
     if colliding_with_mouse(world.easy_button.background):
         pop_scene(difficulty = 'easy')
     if colliding_with_mouse(world.medium_button.background):
@@ -148,50 +203,83 @@ def handle_settings_buttons(world: SettingsScreen):
         pop_scene(difficulty = 'hard')
 
 def handle_end_buttons(world: EndScreen):
-    """ When user clicks quit button, application closes
-     or if play again is pressed, it takes you back to world"""
+    """
+    When user clicks quit button, application closes
+    When user clicks play again button, scene changes to world
+    Args:
+        world (EndScreen): EndScreen instance
+    """
     if colliding_with_mouse(world.quit_button.background):
         quit()
     if colliding_with_mouse(world.play_again_button.background):
         change_scene('world')
 
 def resume_from_settings(world: World, difficulty: str):
-    """ Used when settings is closed and world resumes. Updates difficulty in world """
+    """
+    Called when settings scene is closed and world resumes.
+    Updates difficulty in world
+    Args:
+        world (World): World instance
+        difficulty (str): string representing chosen difficulty setting
+    """
     world.settings_mode = difficulty
     update_difficulty_mode(world)
 
-def create_salamander(x: int, y: int) -> DesignerObject:
-    """ Create salamander DesignerObject"""
+def create_salamander() -> DesignerObject:
+    """
+    Create salamander character
+    Returns:
+        DesignerObject: image of salamander
+    """
     salamander = image("salamander_with_glasses.png")
-    salamander.x = x
-    salamander.y = y
+    salamander.x = 400
+    salamander.y = 360
     grow(salamander, 0.22)
     return salamander
 
 def create_red_salamander() -> DesignerObject:
+    """
+    Create red salamander character, representing damage
+    Returns:
+        DesignerObject: image of red salamander
+    """
     red_salamander = image('hurt_salamander.png')
     red_salamander.x = 400
     red_salamander.y = 360
     grow(red_salamander, 0.22)
     return red_salamander
 
-def create_page_emoji() -> DesignerObject:
-    """ Create page for display in corner"""
+def show_page_in_corner() -> DesignerObject:
+    """
+    Create page to be displayed in corner
+    Returns:
+        DesignerObject: page emoji
+    """
     page = emoji("📃")
     page.y = 30
     page.x = get_width() - 30
     grow(page, 0.8)
     return page
 
-def show_page_count_text() -> DesignerObject:
-    """ Show number of pages collected in corner """
+def show_page_count_in_corner() -> DesignerObject:
+    """
+    Display number of pages collected in corner
+    Returns:
+        DesignerObject: text displaying page count
+    """
     number = text("black", "0", 30)
     number.y = 30
     number.x = get_width() - 60
     return number
 
 def create_heart(x: int) -> DesignerObject:
-    """ Create heart DesignerObject """
+    """
+    Create heart to be displayed in corner
+    Args:
+        x (int): x position of heart
+    Returns:
+        DesignerObject: heart image
+    """
     heart = image("heart_icon.png")
     heart.y = 70
     heart.x = x
@@ -199,37 +287,60 @@ def create_heart(x: int) -> DesignerObject:
     return heart
 
 def move_salamander(world: World):
-    """ Move salamander horizontally left and right """
+    """
+    Changes speed to move salamander horizontally left and right
+    Args:
+        world (World): World instance
+    """
     world.salamander.x += world.salamander_speed
 
 def move_right(world: World):
-    """ Salamander moves right """
+    """
+    Salamander moves right
+    Args:
+        world (World): World instance
+    """
     world.salamander_speed = SALAMANDER_SPEED
 
 def move_left(world: World):
-    """ Salamander moves left """
+    """
+    Salamander moves left
+    Args:
+        world (World): World instance
+    """
     world.salamander_speed = -SALAMANDER_SPEED
 
-def keys_pressed(world: World, key: str) :
-    """ Check to see if key is pressed
+def keys_pressed(world: World, key: str):
+    """
+    Checks to see if key is pressed
     Args:
-        key(str): name of key being pressed """
+        world (World): World instance
+        key (str): name of key being pressed
+    """
     if key == "right":
         world.moving_right = True
     elif key == "left":
         world.moving_left = True
 
-def keys_not_pressed(world: World, key: str) :
-    """ Check to see if key is pressed
+def keys_not_pressed(world: World, key: str):
+    """
+    Checks to see if key is pressed
     Args:
-        key(str): name of key being pressed """
+        world (World): World instance
+        key (str): name of key being pressed
+    """
     if key == "right":
         world.moving_right = False
     elif key == "left":
         world.moving_left = False
 
 def salamander_direction(world: World):
-    """ Salamander moves horizontally depending on keys and only within screen limit """
+    """
+    Checks if a key is pressed and if Salamander is within screen limit,
+    then move horizontally or not at all
+    Args:
+        world (World): World instance
+    """
     if world.moving_right and world.salamander.x < MAX_X_POSITION:
         move_right(world)
     elif world.moving_left and world.salamander.x > MIN_X_POSITION:
@@ -237,8 +348,12 @@ def salamander_direction(world: World):
     else:
         world.salamander_speed = 0
 
-def create_page_object() -> DesignerObject:
-    """ Create page DesignerObject """
+def create_page() -> DesignerObject:
+    """
+    Creates page that falls down screen
+    Returns:
+        DesignerObject: page emoji
+    """
     page = emoji("📃")
     grow(page, 0.8)
     page.anchor = "midtop"
@@ -247,19 +362,31 @@ def create_page_object() -> DesignerObject:
     return page
 
 def make_pages(world: World):
-    """ Create page randomly if there aren't enough currently """
+    """
+    Creates page randomly if there aren't enough currently
+    Args:
+        world (World): World instance
+    """
     not_enough_pages = len(world.pages) < MAX_OBJECTS
     random_chance = randint(1, world.spawn_rate) == 1
     if not_enough_pages and random_chance:
-        world.pages.append(create_page_object())
+        world.pages.append(create_page())
 
 def move_pages_down(world: World):
-    """ Move each page downward """
+    """
+    Moves each page downward
+    Args:
+        world (World): World instance
+    """
     for page in world.pages:
         page.y += world.page_speed
 
 def destroy_page_on_ground(world: World):
-    """ Destroy pages that touch the ground """
+    """
+    Destroy pages that touch the ground
+    Args:
+        world (World): World instance
+    """
     keep = []
     for page in world.pages:
         if page.y < get_height():
@@ -269,7 +396,11 @@ def destroy_page_on_ground(world: World):
         world.pages = keep
 
 def destroy_when_page_collide(world: World):
-    """ Filters and destroys pages that collide with Salamander, then adds to score"""
+    """
+    Filters and destroys pages that collide with Salamander, then adds to score
+    Args:
+        world (World): World instance
+    """
     keep = []
     for page in world.pages:
         if colliding(page, world.salamander):
@@ -279,12 +410,20 @@ def destroy_when_page_collide(world: World):
             keep.append(page)
     world.pages = keep
 
-def update_score_text(world: World):
-    """ Score is shown and updated """
-    world.show_page_text.text = str(world.page_count)
+def update_score(world: World):
+    """
+    Score is updated to world
+    Args:
+        world (World): World instance
+    """
+    world.page_count_in_corner.text = str(world.page_count)
 
 def create_bomb() -> DesignerObject:
-    """ Create bomb DesignerObject """
+    """
+    Create bomb that falls down screen
+    Returns:
+        DesignerObject: bomb emoji
+    """
     bomb = emoji("💣")
     bomb.anchor = "midtop"
     bomb.x = randint(MIN_X_POSITION, MAX_X_POSITION)
@@ -292,19 +431,31 @@ def create_bomb() -> DesignerObject:
     return bomb
 
 def make_bombs(world: World):
-    """ Create bomb randomly if there aren't enough currently """
+    """
+    Create bomb randomly if there aren't enough currently
+    Args:
+        world (World): World instance
+    """
     not_enough_bombs = len(world.bombs) < MAX_OBJECTS
     random_odds = randint(1, world.spawn_rate) == 1
     if not_enough_bombs and random_odds:
         world.bombs.append(create_bomb())
 
 def move_bombs_down(world: World):
-    """ Move each bomb down """
+    """
+    Move each bomb down
+    Args:
+        world (World): World instance
+    """
     for bomb in world.bombs:
         bomb.y += world.bomb_speed
 
 def destroy_bomb_on_ground(world: World):
-    """ Destroy bombs that touch the ground """
+    """
+    Destroy bombs that touch the ground
+    Args:
+        world (World): World instance
+    """
     keep = []
     for bomb in world.bombs:
         if bomb.y < get_height():
@@ -312,51 +463,77 @@ def destroy_bomb_on_ground(world: World):
         else:
             destroy(bomb)
         world.bombs = keep
-"""
+
+
 def salamander_show_damage(world: World):
-    "" When Salamander collides with bomb, it is moved back to center
-     and sequence animation flashes red""
-    #destroy(world.salamander)
-    salamander_hurt_sequence = [create_salamander(400, 360), create_red_salamander(), create_salamander(400, 360)]
-    sequence_animation(create_salamander(400,360), 'filename', salamander_hurt_sequence, 3.0, 3, False, None, False)
-    #world.salamander = create_salamander(400, 360)
-"""
+    """
+    Sequence animation flashes red and Salamander is moved to center screen
+    Args:
+        world (World): World instance
+    """
+    salamander_hurt_sequence = [create_salamander(), create_red_salamander(), create_salamander()]
+    sequence_animation(world.salamander, 'filename', salamander_hurt_sequence, 3.0, 3, False, None, False)
+
+def subtract_from_score(world: World):
+    """
+    Subtract 2 from score if possible. Score must stay above 0
+    Args:
+        world (World): World instance
+    """
+    if world.page_count >= 2:
+        world.page_count -= 2
+    else:
+        world.page_count = 0
+
 def salamander_bombs_collide(world: World):
-    """ When salamander and bombs collide,
-    filter and destroy bombs,
-    subtracts from score
-    removes a heart """
+    """
+    When salamander and bombs collide, filter and destroy bombs, salamander show hurt,
+    remove_heart, and subtracts from score
+    Args:
+        world (World): World instance
+    """
     keep = []
     for bomb in world.bombs:
         if colliding(bomb, world.salamander):
             destroy(bomb)
             #salamander_show_damage(world)
             remove_heart(world)
-            # score must stay >= 0
-            if world.page_count >= 2:
-                world.page_count -= 2
-            else:
-                world.page_count = 0
+            subtract_from_score(world)
         else:
             keep.append(bomb)
     world.bombs = keep
+
 def salamander_fall_animation(world: World):
-    """ pauses falling objects and prevents new ones from spawning,
-    salamander spins and falls offscreen """
+    """
+    Stops objects from falling and spawning, animation for salamander to spin offscreen
+    Args:
+        world (World): World instance
+    """
     world.page_speed = 0
     world.bomb_speed = 0
     world.spawn_rate = 10000
+    world.salamander.flip_y = True
     linear_animation(world.salamander, 'angle', 0, 360, 2.0, True, None, False)
     linear_animation(world.salamander, 'y', 360, 700, 2.0, True, None, False)
 
 def game_over(world: World):
-    """ When the game is over, Salamander fall animation, and changes scene """
+    """
+    When the game is over, Salamander fall animation and change scene to EndScreen
+    Args:
+        world (World): World instance
+    """
     salamander_fall_animation(world)
-    if world.salamander.y >= 600:
+    print(world.salamander.y)
+    # 360
+    if world.salamander.y > 600:
         change_scene('end', final_page_count = world.page_count)
 
 def remove_heart(world: World):
-    """ Subtracts from heart count, destroys heart, updating hearts in world """
+    """
+    Subtract from heart count, destroys heart, and update hearts in world
+    Args:
+        world (World): World instance
+    """
     world.hearts_remaining -= 1
     for heart in world.hearts:
         destroy(heart)
@@ -371,8 +548,12 @@ def remove_heart(world: World):
         game_over(world)
 
 def update_difficulty_mode(world: World):
-    """ Adjusts speed and spawn rate of bombs and pages depending on selected difficulty mode,
-     updates display with current difficulty level """
+    """
+    Adjusts speed and spawn rate of bombs and pages depending on selected difficulty mode,
+    then updates display with current difficulty level
+    Args:
+        world (World): World instance
+    """
     if world.settings_mode == 'easy':
         world.display_difficulty.text = "EASY"
         world.page_speed = 4
@@ -404,7 +585,7 @@ when('updating: world', make_pages)
 when('updating: world', move_pages_down)
 when('updating: world', destroy_page_on_ground)
 when('updating: world',destroy_when_page_collide)
-when('updating: world', update_score_text)
+when('updating: world', update_score)
 when('updating: world', make_bombs)
 when('updating: world', move_bombs_down)
 when('updating: world', destroy_bomb_on_ground)

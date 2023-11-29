@@ -34,7 +34,7 @@ Phase 2:
 
 Phase 3:
 - [x] Title Screen: Instructions and play button shown at beginning
-- [ ] Settings: Settings button causes window to appear which adjusts difficulty level
+- [x] Settings: Settings button causes window to appear which adjusts difficulty level
 - [ ] Salamander hurt: Salamander stops moving for a second and flashes red when a life is lost
 - [ ] Salamander fall: When game ends, salamander falls to bottom of screen
 - [x] Game over Screen: Text shows game over and final page count

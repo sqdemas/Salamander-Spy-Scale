@@ -7,7 +7,7 @@ Sam Demas, username: sqdemas, email: sqdemas@udel.edu
 Players will maneuver the Salamander left and right with the arrow keys to collect pages of classified 
 documents while dodging bombs in his path. When the Salamander is hit three times with a bomb, the game
 will end. There will be a settings tab in the corner allowing players to adjust difficulty 
-between easy, normal and hard.
+between easy, medium, and hard.
 
 Milestone 1 Demo Video: https://youtu.be/vHzACxT1kBo
 

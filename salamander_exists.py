@@ -3,30 +3,16 @@ from designer import *
 from random import randint
 
 SALAMANDER_SPEED = 10
-PAGE_SPEED = 6
-BOMB_SPEED = 8
+MAX_OBJECTS = 10
+
+# x position of hearts in corner
 LEFT_HEART_X = 710
 MIDDLE_HEART_X = 745
 RIGHT_HEART_X = 780
-SPAWN_RATE = 30
-MAX_OBJECTS = 10
+
+# screen limit x positons
 MAX_X_POSITION = 670
 MIN_X_POSITION = 128
-
-@dataclass
-class World:
-    background: DesignerObject
-    salamander: DesignerObject
-    salamander_speed: int
-    moving_left: bool
-    moving_right: bool
-    page: DesignerObject
-    page_count: int
-    show_page_text: DesignerObject
-    hearts: list[DesignerObject]
-    pages: list[DesignerObject]
-    bombs: list[DesignerObject]
-    hearts_remaining: int
 
 @dataclass
 class Button:
@@ -47,11 +33,44 @@ class TitleScreen:
     play_button: Button
 
 @dataclass
+class World:
+    background: DesignerObject
+    salamander: DesignerObject
+    salamander_speed: int
+    moving_left: bool
+    moving_right: bool
+    page: DesignerObject
+    page_count: int
+    show_page_text: DesignerObject
+    hearts: list[DesignerObject]
+    pages: list[DesignerObject]
+    bombs: list[DesignerObject]
+    hearts_remaining: int
+    settings_button: Button
+    settings_mode: str
+    page_speed: int
+    bomb_speed: int
+    spawn_rate: int
+    display_mode: DesignerObject
+    display_difficulty: DesignerObject
+
+@dataclass
+class SettingsScreen:
+    """ Displays settings to switch game difficulty """
+    background: DesignerObject
+    rectangle: DesignerObject
+    heading: DesignerObject
+    easy_button: Button
+    medium_button: Button
+    hard_button: Button
+
+@dataclass
 class EndScreen:
     """ Works as game over screen """
     background: DesignerObject
     message: DesignerObject
     quit_button: Button
+    play_again_button: Button
 
 def make_button(message: str, x: int, y: int, length: int, width: int, text_size: int, color: str) -> Button:
     """ Creates object with inner rectangle, outer rectangle, and text """
@@ -77,18 +96,69 @@ def create_title_screen() -> TitleScreen:
                        text('black', instruction5, 20, 400, 300),
                        make_button("PLAY", get_width()/2, 400, 80, 50, 30, 'chartreuse'))
 
+def create_world() -> World:
+    """ Create the world where actual gameplay occurs """
+    return World(background_image('background.png'),
+                 create_salamander(400, 360), 0, False, False, create_page_emoji(), 0,
+                 show_page_count_text(),
+                 [create_heart(LEFT_HEART_X), create_heart(MIDDLE_HEART_X), create_heart(RIGHT_HEART_X)],
+                 [], [], 3,
+                 make_button("SETTINGS", 50, 40, 80, 40, 18, 'tan'),
+                 'medium', 6, 8, 30,
+                 text('black', "MODE:", 18, 50, 80),
+                 text('black', "MEDIUM", 20, 50, 100)
+                 )
+
+def create_settings_screen() -> SettingsScreen:
+    """ Settings to allow user to change difficulty """
+    return SettingsScreen(background_image('city_background.jpg'),
+                          make_button("", 400, 300, 640, 400, 0, 'cadetblue'),
+                          text('black', "SETTINGS", 50, 400, 200),
+                          make_button("EASY", 200, 350, 80, 50, 30, 'green'),
+                          make_button("MEDIUM", 400, 350, 110, 50, 30, 'green'),
+                          make_button("HARD", 600, 350, 80, 50, 30, 'green')
+                          )
+
+def create_end_screen(final_page_count: int) -> EndScreen:
+    """ Shows background, game over message with final score, quit button to end program, and play again button to redirect to world """
+    game_over_message = "GAME OVER! SCORE:  " + str(final_page_count)
+    return EndScreen(background_image('background.png'),
+                     make_button(game_over_message, get_width()/2, 270, 450, 90, 40, 'oldlace'),
+                     make_button("QUIT", 300, 350, 80, 50, 30, 'skyblue'),
+                     make_button("PLAY AGAIN", 450, 350, 160, 50, 30, 'skyblue')
+                     )
+
 def handle_title_buttons(world: TitleScreen):
     """ When user presses play button, scene changes to world """
     if colliding_with_mouse(world.play_button.background):
         change_scene('world')
 
-def create_world() -> World:
-    """ Create the world """
-    return World(background_image('background.png'),
-                 create_salamander(400, 360), 0, False, False, create_page_emoji(), 0,
-                 show_page_count_text(),
-                 [create_heart(LEFT_HEART_X), create_heart(MIDDLE_HEART_X), create_heart(RIGHT_HEART_X)],
-                 [], [], 3)
+def handle_world_buttons(world: World):
+    """ Push settings scene when settings button is clicked """
+    if colliding_with_mouse(world.settings_button.background):
+        push_scene('settings')
+
+def handle_settings_buttons(world: SettingsScreen):
+    """When user presses a difficulty mode, that mode is selected and sent back to world when scene is popped """
+    if colliding_with_mouse(world.easy_button.background):
+        pop_scene(difficulty = 'easy')
+    if colliding_with_mouse(world.medium_button.background):
+        pop_scene(difficulty = 'medium')
+    if colliding_with_mouse(world.hard_button.background):
+        pop_scene(difficulty = 'hard')
+
+def handle_end_buttons(world: EndScreen):
+    """ When user clicks quit button, application closes
+     or if play again is pressed, it takes you back to world"""
+    if colliding_with_mouse(world.quit_button.background):
+        quit()
+    if colliding_with_mouse(world.play_again_button.background):
+        change_scene('world')
+
+def resume_from_settings(world: World, difficulty: str):
+    """ Used when settings is closed and world resumes. Updates difficulty in world """
+    world.settings_mode = difficulty
+    update_difficulty_mode(world)
 
 def create_salamander(x: int, y: int) -> DesignerObject:
     """ Create salamander DesignerObject"""
@@ -97,6 +167,13 @@ def create_salamander(x: int, y: int) -> DesignerObject:
     salamander.y = y
     grow(salamander, 0.22)
     return salamander
+
+def create_red_salamander() -> DesignerObject:
+    red_salamander = image('hurt_salamander.png')
+    red_salamander.x = 400
+    red_salamander.y = 360
+    grow(red_salamander, 0.22)
+    return red_salamander
 
 def create_page_emoji() -> DesignerObject:
     """ Create page for display in corner"""
@@ -172,14 +249,14 @@ def create_page_object() -> DesignerObject:
 def make_pages(world: World):
     """ Create page randomly if there aren't enough currently """
     not_enough_pages = len(world.pages) < MAX_OBJECTS
-    random_chance = randint(1, SPAWN_RATE) == 1
+    random_chance = randint(1, world.spawn_rate) == 1
     if not_enough_pages and random_chance:
         world.pages.append(create_page_object())
 
 def move_pages_down(world: World):
     """ Move each page downward """
     for page in world.pages:
-        page.y += PAGE_SPEED
+        page.y += world.page_speed
 
 def destroy_page_on_ground(world: World):
     """ Destroy pages that touch the ground """
@@ -217,14 +294,14 @@ def create_bomb() -> DesignerObject:
 def make_bombs(world: World):
     """ Create bomb randomly if there aren't enough currently """
     not_enough_bombs = len(world.bombs) < MAX_OBJECTS
-    random_odds = randint(1, SPAWN_RATE) == 1
+    random_odds = randint(1, world.spawn_rate) == 1
     if not_enough_bombs and random_odds:
         world.bombs.append(create_bomb())
 
 def move_bombs_down(world: World):
     """ Move each bomb down """
     for bomb in world.bombs:
-        bomb.y += BOMB_SPEED
+        bomb.y += world.bomb_speed
 
 def destroy_bomb_on_ground(world: World):
     """ Destroy bombs that touch the ground """
@@ -235,11 +312,15 @@ def destroy_bomb_on_ground(world: World):
         else:
             destroy(bomb)
         world.bombs = keep
-
+"""
 def salamander_show_damage(world: World):
-    """ Sequence animation to show Salamander hurt when collides with bomb """
-    #sequence_animation(world.salamander, )
-
+    "" When Salamander collides with bomb, it is moved back to center
+     and sequence animation flashes red""
+    #destroy(world.salamander)
+    salamander_hurt_sequence = [create_salamander(400, 360), create_red_salamander(), create_salamander(400, 360)]
+    sequence_animation(create_salamander(400,360), 'filename', salamander_hurt_sequence, 3.0, 3, False, None, False)
+    #world.salamander = create_salamander(400, 360)
+"""
 def salamander_bombs_collide(world: World):
     """ When salamander and bombs collide,
     filter and destroy bombs,
@@ -249,7 +330,7 @@ def salamander_bombs_collide(world: World):
     for bomb in world.bombs:
         if colliding(bomb, world.salamander):
             destroy(bomb)
-            #salamander_show_damage()
+            #salamander_show_damage(world)
             remove_heart(world)
             # score must stay >= 0
             if world.page_count >= 2:
@@ -259,13 +340,20 @@ def salamander_bombs_collide(world: World):
         else:
             keep.append(bomb)
     world.bombs = keep
+def salamander_fall_animation(world: World):
+    """ pauses falling objects and prevents new ones from spawning,
+    salamander spins and falls offscreen """
+    world.page_speed = 0
+    world.bomb_speed = 0
+    world.spawn_rate = 10000
+    linear_animation(world.salamander, 'angle', 0, 360, 2.0, True, None, False)
+    linear_animation(world.salamander, 'y', 360, 700, 2.0, True, None, False)
 
 def game_over(world: World):
-    """ When there are no lives, the game is over.
-     Salamander should fall off screen
-     Then scene is changed """
-    # linear_animation(world.salamander, 'y', world.salamander.y, 600, 3.0)
-    change_scene('end', final_page_count = world.page_count)
+    """ When the game is over, Salamander fall animation, and changes scene """
+    salamander_fall_animation(world)
+    if world.salamander.y >= 600:
+        change_scene('end', final_page_count = world.page_count)
 
 def remove_heart(world: World):
     """ Subtracts from heart count, destroys heart, updating hearts in world """
@@ -282,23 +370,32 @@ def remove_heart(world: World):
         world.hearts = []
         game_over(world)
 
-def create_end_screen(final_page_count: int) -> EndScreen:
-    """ Shows background, game over message with final score, and quit button to end program """
-    game_over_message = "GAME OVER! SCORE:  " + str(final_page_count)
-    return EndScreen(background_image('background.png'),
-                     make_button(game_over_message, get_width()/2, 270, 450, 90, 40, 'oldlace'),
-                     make_button("QUIT", get_width()/2, 350, 80, 50, 30, 'skyblue')
-                     )
-
-def handle_end_buttons(world: EndScreen):
-    """ When user clicks quit button, application closes """
-    if colliding_with_mouse(world.quit_button):
-        quit()
+def update_difficulty_mode(world: World):
+    """ Adjusts speed and spawn rate of bombs and pages depending on selected difficulty mode,
+     updates display with current difficulty level """
+    if world.settings_mode == 'easy':
+        world.display_difficulty.text = "EASY"
+        world.page_speed = 4
+        world.bomb_speed = 6
+        world.spawn_rate = 60
+    elif world.settings_mode == 'medium':
+        world.display_difficulty.text = "MEDIUM"
+        world.page_speed = 6
+        world.bomb_speed = 8
+        world.spawn_rate = 30
+    elif world.settings_mode == 'hard':
+        world.display_difficulty.text = "HARD"
+        world.page_speed = 8
+        world.bomb_speed = 10
+        world.spawn_rate = 20
 
 when("starting: title", create_title_screen)
 when("clicking: title", handle_title_buttons)
 
 when('starting: world', create_world)
+when('clicking: world', handle_world_buttons)
+when('entering: world', resume_from_settings)
+
 when('updating: world', move_salamander)
 when('typing: world', keys_pressed)
 when('done typing: world', keys_not_pressed)
@@ -312,6 +409,9 @@ when('updating: world', make_bombs)
 when('updating: world', move_bombs_down)
 when('updating: world', destroy_bomb_on_ground)
 when('updating: world',salamander_bombs_collide)
+
+when('starting: settings', create_settings_screen)
+when('clicking: settings', handle_settings_buttons)
 
 when('starting: end', create_end_screen)
 when('clicking: end', handle_end_buttons)

@@ -3,7 +3,7 @@ from designer import *
 from random import randint
 
 SALAMANDER_SPEED = 10
-MAX_OBJECTS = 10
+MAX_OBJECTS = 7
 
 # x position of hearts in corner
 LEFT_HEART_X = 710
@@ -17,6 +17,8 @@ MIN_X_POSITION = 150
 # filenames for salamander hurt animation
 NORMAL = "salamander_with_glasses.png"
 RED = "hurt_salamander.png"
+
+set_window_color('skyblue')
 
 @dataclass
 class Button:
@@ -40,7 +42,7 @@ class TitleScreen:
 @dataclass
 class World:
     """ Main gameplay """
-    background: DesignerObject
+    clouds: list[DesignerObject]
     building: DesignerObject
     windows: list[list[DesignerObject]]
     salamander: DesignerObject
@@ -101,14 +103,15 @@ def make_button(message: str, x: int, y: int, length: int, width: int, text_size
 
 def create_window(x: int, y: int) -> DesignerObject:
     """
-    Creates blue rectangle representing a window
+    Creates window from image
     Args:
         x (int): x position of window
         y (int): y position of window
     Returns:
-        DesignerObject: blue rectangle
+        DesignerObject: window image
     """
-    window = rectangle('teal', 90, 60)
+    window = image('window.png')
+    grow(window, 0.15)
     window.x = x
     window.y = y
     return window
@@ -132,11 +135,35 @@ def move_windows_down(world: World):
     Args:
         world (World): World instance
     """
-
     for window_list in world.windows:
         for window in window_list:
             window.y += 1
             window.y = window.y % get_window_height()
+
+def create_cloud(x: int, y: int) -> DesignerObject:
+    """
+    Creates cloud for background in sky
+    Args:
+        x (int): x position of cloud
+        y (int): y position of cloud
+    Returns:
+        DesignerObject: cloud image
+    """
+    cloud = image('cloud.png')
+    grow(cloud, 0.5)
+    cloud.x = x
+    cloud.y = y
+    return cloud
+
+def move_clouds_down(world: World):
+    """
+    Moves each individual cloud downward and wraps around
+    Args:
+        world (World): World instance
+    """
+    for cloud in world.clouds:
+        cloud.y += 1
+        cloud.y = cloud.y % get_window_height()
 
 
 def create_title_screen() -> TitleScreen:
@@ -167,7 +194,7 @@ def create_world() -> World:
     Returns:
         World: World instance
     """
-    return World(background_image('clouds.png'),
+    return World([create_cloud(100, 150), create_cloud(150, 400), create_cloud(700, 100), create_cloud(740, 500)],
                  create_building(),
                  [create_window_list(200), create_window_list(333), create_window_list(466), create_window_list(600)],
                  create_salamander(), 0, False, False,
@@ -628,6 +655,7 @@ when('updating: world', destroy_bomb_on_ground)
 when('updating: world',salamander_bombs_collide)
 when('updating: world', when_game_over)
 when('updating: world', move_windows_down)
+when('updating: world', move_clouds_down)
 
 when('starting: settings', create_settings_screen)
 when('clicking: settings', handle_settings_buttons)

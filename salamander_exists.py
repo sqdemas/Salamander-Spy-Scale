@@ -11,8 +11,12 @@ MIDDLE_HEART_X = 745
 RIGHT_HEART_X = 780
 
 # screen limit x max and min positions
-MAX_X_POSITION = 670
-MIN_X_POSITION = 128
+MAX_X_POSITION = 650
+MIN_X_POSITION = 150
+
+# filenames for salamander hurt animation
+NORMAL = "salamander_with_glasses.png"
+RED = "hurt_salamander.png"
 
 @dataclass
 class Button:
@@ -37,6 +41,8 @@ class TitleScreen:
 class World:
     """ Main gameplay """
     background: DesignerObject
+    building: DesignerObject
+    windows: list[list[DesignerObject]]
     salamander: DesignerObject
     salamander_speed: int
     moving_left: bool
@@ -93,6 +99,46 @@ def make_button(message: str, x: int, y: int, length: int, width: int, text_size
                   rectangle('black', length, width, x, y, 1),
                   label)
 
+def create_window(x: int, y: int) -> DesignerObject:
+    """
+    Creates blue rectangle representing a window
+    Args:
+        x (int): x position of window
+        y (int): y position of window
+    Returns:
+        DesignerObject: blue rectangle
+    """
+    window = rectangle('teal', 90, 60)
+    window.x = x
+    window.y = y
+    return window
+
+def create_window_list(x: int) -> list[DesignerObject]:
+    """
+    Creates a vertical column of windows
+    Args:
+        x (int): x position of windows
+    Returns:
+        list[DesignerObject]: list of window objects
+    """
+    window_column = []
+    for number in [1,2,3,4,5,6,7]:
+        window_column.append(create_window(x, number*100))
+    return window_column
+
+def move_windows_down(world: World):
+    """
+    Moves each individual window downward and wraps around
+    Args:
+        world (World): World instance
+    """
+
+    for window_list in world.windows:
+        for window in window_list:
+            window.y += 1
+            window.y = window.y % get_window_height()
+
+
 def create_title_screen() -> TitleScreen:
     """
     Creates Title Screen with background, header, empty button with text instructions, and play button
@@ -114,13 +160,6 @@ def create_title_screen() -> TitleScreen:
                        text('black', instruction5, 20, 400, 300),
                        make_button("PLAY", get_width()/2, 400, 80, 50, 30, 'chartreuse'))
 
-def animate_background():
-    """
-    Sequence animation to loop through list of background images to give illusion of moving background
-    """
-    sequence_animation(background_image('one.png'), 'filename', [background_image('one.png'), background_image('two.png'), background_image('three.png')],
-                       3, 3, True, None, False)
-
 def create_world() -> World:
     """
     Creates the world where actual gameplay occurs, background, salamander character,
@@ -128,7 +167,9 @@ def create_world() -> World:
     Returns:
         World: World instance
     """
-    return World(background_image('background.png'),
+    return World(background_image('clouds.png'),
+                 create_building(),
+                 [create_window_list(200), create_window_list(333), create_window_list(466), create_window_list(600)],
                  create_salamander(), 0, False, False,
                  show_page_in_corner(), 0,
                  show_page_count_in_corner(),
@@ -164,7 +205,7 @@ def create_end_screen(final_page_count: int) -> EndScreen:
         EndScreen: EndScreen instance
     """
     game_over_message = "GAME OVER! SCORE:  " + str(final_page_count)
-    return EndScreen(background_image('background.png'),
+    return EndScreen(background_image('city_background.jpg'),
                      make_button(game_over_message, 400, 270, 450, 90, 40, 'oldlace'),
                      make_button("QUIT", 300, 350, 80, 50, 30, 'skyblue'),
                      make_button("PLAY AGAIN", 450, 350, 160, 50, 30, 'skyblue')
@@ -225,6 +266,15 @@ def resume_from_settings(world: World, difficulty: str):
     world.settings_mode = difficulty
     update_difficulty_mode(world)
 
+def create_building() -> DesignerObject:
+    """
+    Creates brown rectangle representing building
+    Returns:
+        DesignerObject: brown rectangle
+    """
+    building = rectangle('saddlebrown', 570, 600)
+    return building
+
 def create_salamander() -> DesignerObject:
     """
     Create salamander character
@@ -236,18 +286,6 @@ def create_salamander() -> DesignerObject:
     salamander.y = 360
     grow(salamander, 0.22)
     return salamander
-
-def create_red_salamander() -> DesignerObject:
-    """
-    Create red salamander character, representing damage
-    Returns:
-        DesignerObject: image of red salamander
-    """
-    red_salamander = image('hurt_salamander.png')
-    red_salamander.x = 400
-    red_salamander.y = 360
-    grow(red_salamander, 0.22)
-    return red_salamander
 
 def show_page_in_corner() -> DesignerObject:
     """
@@ -467,12 +505,13 @@ def destroy_bomb_on_ground(world: World):
 
 def salamander_show_damage(world: World):
     """
-    Sequence animation flashes red and Salamander is moved to center screen
+    Sequence animation flashes red
     Args:
         world (World): World instance
     """
-    salamander_hurt_sequence = [create_salamander(), create_red_salamander(), create_salamander()]
-    sequence_animation(world.salamander, 'filename', salamander_hurt_sequence, 3.0, 3, False, None, False)
+    salamander_hurt_sequence = [NORMAL, RED, NORMAL]
+    sequence_animation(world.salamander, 'filename', salamander_hurt_sequence,
+                       1, 2)
 
 def subtract_from_score(world: World):
     """
@@ -496,7 +535,7 @@ def salamander_bombs_collide(world: World):
     for bomb in world.bombs:
         if colliding(bomb, world.salamander):
             destroy(bomb)
-            #salamander_show_damage(world)
+            salamander_show_damage(world)
             remove_heart(world)
             subtract_from_score(world)
         else:
@@ -516,16 +555,13 @@ def salamander_fall_animation(world: World):
     linear_animation(world.salamander, 'angle', 0, 360, 2.0, True, None, False)
     linear_animation(world.salamander, 'y', 360, 700, 2.0, True, None, False)
 
-def game_over(world: World):
+def when_game_over(world: World):
     """
-    When the game is over, Salamander fall animation and change scene to EndScreen
+    When the game is over, change scene to EndScreen
     Args:
         world (World): World instance
     """
-    salamander_fall_animation(world)
-    print(world.salamander.y)
-    # 360
-    if world.salamander.y > 600:
+    if world.salamander.y >= 600:
         change_scene('end', final_page_count = world.page_count)
 
 def remove_heart(world: World):
@@ -545,7 +581,7 @@ def remove_heart(world: World):
         world.hearts = [create_heart(RIGHT_HEART_X)]
     elif (world.hearts_remaining == 0):
         world.hearts = []
-        game_over(world)
+        salamander_fall_animation(world)
 
 def update_difficulty_mode(world: World):
     """
@@ -590,6 +626,8 @@ when('updating: world', make_bombs)
 when('updating: world', move_bombs_down)
 when('updating: world', destroy_bomb_on_ground)
 when('updating: world',salamander_bombs_collide)
+when('updating: world', when_game_over)
+when('updating: world', move_windows_down)
 
 when('starting: settings', create_settings_screen)
 when('clicking: settings', handle_settings_buttons)

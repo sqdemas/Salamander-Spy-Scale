@@ -1,32 +1,41 @@
 # Salamander-Spy-Scale
 
-**Pitch:** 
+## **Pitch** 
 
 It is an infinite runner style game, with a Salamander scaling up a building in attempt to collect 
 pages while dodging bombs.
 
-**About:** 
+---
+## **About** 
 
-Players will maneuver the Salamander left and right with the arrow keys to collect pages of classified 
-documents while dodging bombs in his path. The Salamander loses a heart each time he is hit with a bomb and when all 
+Players will maneuver the SuoerSpy Salamander left and right with the arrow keys to collect pages of classified 
+documents while dodging bombs. The Salamander loses a heart each time he is hit with a bomb and when all 
 three hearts are lost, the game will end. When the game is over, the user can choose to quit or play again. 
 There will be a settings tab in the corner allowing players to adjust difficulty between easy, medium, and hard.
 
-**Preview:** 
+---
+## **Preview** 
 
-**Instructions:** 
+---
+## **Instructions** 
 
-When held down, the left and right arrow keys control the main character to move horizontally.
+- Hold down the left and right arrow keys to control the Salamander to move horizontally
+- Collect as many pages as possible while adoiding bombs
+- Use Settings tab in corner to adjust difficulty
 
-**Author:** 
+---
+## **Author** 
+|    Name   |      Email       |
+|-----------|------------------
+| Sam Demas | sqdemas@udel.edu |
 
-Sam Demas, username: sqdemas, email: sqdemas@udel.edu
+---
+## **Acknowledgements** 
 
-**Acknowledgements:** 
+[Designer Documentation](https://designer-edu.github.io/designer/contents.html#)
 
-Designer Documentation: https://designer-edu.github.io/designer/contents.html#
-
-**Task List:**
+---
+## **Task List:**
 
 Phase 1:
 - [x] Salamander exists: Salamander appears in center of screen

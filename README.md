@@ -1,18 +1,26 @@
 # Salamander-Spy-Scale
 
-**Pitch:** It is an infinite runner style game, with a Salamander scaling up a building in attempt to collect 
+**Pitch:** 
+
+It is an infinite runner style game, with a Salamander scaling up a building in attempt to collect 
 pages while dodging bombs.
 
-**About:** Players will maneuver the Salamander left and right with the arrow keys to collect pages of classified 
+**About:** 
+
+Players will maneuver the Salamander left and right with the arrow keys to collect pages of classified 
 documents while dodging bombs in his path. The Salamander loses a heart each time he is hit with a bomb and when all 
 three hearts are lost, the game will end. When the game is over, the user can choose to quit or play again. 
 There will be a settings tab in the corner allowing players to adjust difficulty between easy, medium, and hard.
 
 **Preview:** 
 
-**Instructions:** When held down, the left and right arrow keys control the main character to move horizontally.
+**Instructions:** 
 
-**Authors:** Sam Demas, username: sqdemas, email: sqdemas@udel.edu
+When held down, the left and right arrow keys control the main character to move horizontally.
+
+**Author:** 
+
+Sam Demas, username: sqdemas, email: sqdemas@udel.edu
 
 **Acknowledgements:** 
 
@@ -43,5 +51,5 @@ Phase 3:
 - [x] Salamander hurt: Salamander flashes red when a life is lost
 - [x] Salamander fall: When game ends, salamander falls to bottom of screen
 - [x] Game over Screen: Text shows game over and final page count
-- [ ] Moving background: Windows and clouds move downward to give illusion that salamander is moving upward
+- [x] Moving background: Windows and clouds move downward to give illusion that salamander is moving upward
 

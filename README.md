@@ -8,7 +8,7 @@ pages while dodging bombs.
 ---
 ## **About** 
 
-Players will maneuver the SuoerSpy Salamander left and right with the arrow keys to collect pages of classified 
+Players will maneuver the SuperSpy Salamander left and right with the arrow keys to collect pages of classified 
 documents while dodging bombs. The Salamander loses a heart each time he is hit with a bomb and when all 
 three hearts are lost, the game will end. When the game is over, the user can choose to quit or play again. 
 There will be a settings tab in the corner allowing players to adjust difficulty between easy, medium, and hard.
@@ -16,11 +16,13 @@ There will be a settings tab in the corner allowing players to adjust difficulty
 ---
 ## **Preview** 
 
+[Final Video](https://youtu.be/6_Cd0G7WY3A)
+
 ---
 ## **Instructions** 
 
 - Hold down the left and right arrow keys to control the Salamander to move horizontally
-- Collect as many pages as possible while adoiding bombs
+- Collect as many pages as possible while avoiding bombs
 - Use Settings tab in corner to adjust difficulty
 
 ---
